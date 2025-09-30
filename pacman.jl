@@ -4,6 +4,23 @@ using Agents # Importa Agents.jl para las funciones StandardABM, GridSpace, add_
     type::String = "Ghost" # Definir atributo 
 end
 
+matrix = [
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+    0 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 0;
+    0 1 0 1 0 0 0 1 1 1 0 1 0 1 0 1 0;
+    0 1 1 1 0 1 0 0 0 0 0 1 0 1 1 1 0;
+    0 1 0 0 0 1 1 1 1 1 1 1 0 0 0 1 0;
+    0 1 0 1 0 1 0 0 0 0 0 1 1 1 0 1 0;
+    0 1 1 1 0 1 0 1 1 1 0 1 0 1 0 1 0;
+    0 1 0 1 0 1 0 1 1 1 0 1 0 1 0 1 0;
+    0 1 0 1 1 1 0 0 1 0 0 1 0 1 1 1 0;
+    0 1 0 0 0 1 1 1 1 1 1 1 0 0 0 1 0;
+    0 1 1 1 0 1 0 0 0 0 0 1 0 1 1 1 0;
+    0 1 0 1 0 1 0 1 1 1 0 0 0 1 0 1 0;
+    0 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 0;
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+]
+
 # Cambia el estado de la figura qu ehay detrás, con bang --> '!'
 function agent_step!(agent, model)
     randomwalk!(agent, model)
