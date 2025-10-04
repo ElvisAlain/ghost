@@ -21,27 +21,66 @@ matrix = [
     0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 ] # Matriz del laberinto (0: pared, 1: camino)
 
-# Cambia el estado de la figura qu ehay detrás, con bang --> '!'
 function agent_step!(agent, model)
-    # Posibles movimientos: arriba, abajo, izquierda, derecha
-    moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-    posibles = []
-    x, y = agent.pos
+    destino = (10, 2)  # Punto fijo al que perseguir
+
+
+    if agent.pos == destino
+        println("Fantasma llegó al destino en $destino y se queda quieto.")
+        return
+    end
+    camino = bfs(matrix, agent.pos, destino)
+    if length(camino) > 1
+        siguiente = camino[2]  # primer paso real
+        println("Fantasma en $(agent.pos) moviéndose hacia $destino → próximo: $siguiente")
+        move_agent!(agent, siguiente, model)
+    else
+        println("Fantasma en $(agent.pos) no puede avanzar hacia $destino")
+    end
+end
+
+function vecinos(pos, matrix)
+    x, y = pos
+    moves = [(0,1), (0,-1), (1,0), (-1,0)]
+    vecinos = []
     for (dx, dy) in moves
-        nx, ny = x + dx, y + dy
-        # Verifica que la nueva posición esté dentro de los límites de la matriz
-        if 1 <= nx <= size(matrix, 1) && 1 <= ny <= size(matrix, 2)
-            # Solo permite moverse a celdas libres (valor 1: camino :D)
+        nx, ny = x+dx, y+dy
+        if 1 <= nx <= size(matrix,1) && 1 <= ny <= size(matrix,2)
             if matrix[nx, ny] == 1
-                push!(posibles, (nx, ny))
+                push!(vecinos, (nx, ny))
             end
         end
     end
-    # Si hay movimientos posibles, elige uno al azar
-    if !isempty(posibles)
-        nueva_pos = rand(posibles)
-        move_agent!(agent, nueva_pos, model)
+    return vecinos
+end
+
+function bfs(matrix, start, goal)
+    queue = [start]
+    came_from = Dict{Tuple{Int64,Int64}, Union{Nothing,Tuple{Int64,Int64}}}()
+    came_from[start] = nothing
+
+    while !isempty(queue)
+        current = popfirst!(queue)
+
+        if current == goal
+            # Reconstruir camino
+            path = []
+            while current !== nothing
+                push!(path, current)
+                current = came_from[current]
+            end
+            reverse!(path)
+            return path
+        end
+
+        for vecino in vecinos(current, matrix)
+            if !haskey(came_from, vecino)
+                came_from[vecino] = current
+                push!(queue, vecino)
+            end
+        end
     end
+    return []  # No hay camino
 end
 
 # Crear el ambiente, modelo y espacio
